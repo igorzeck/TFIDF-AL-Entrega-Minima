@@ -1,0 +1,4 @@
+Nome,Caminho,Separador,Campo,Idioma
+Teste,datasets/teste_objects_description_pt.csv,",",description,english
+DataSet de Teste,datasets/teste_movies_synopsis_extended.csv,",",synopsis,english
+Teste,datasets/descricao_sistema_harmonizado_ncm.csv,;,NO_NCM_POR,portuguese
