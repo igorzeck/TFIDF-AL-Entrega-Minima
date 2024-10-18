@@ -11,14 +11,16 @@ from nltk.corpus import stopwords
 #
 # Variáveis globais
 #
-default_params = pd.DataFrame([{"Idioma_padrao": "portuguese"}])
+df_metadatasets = pd.DataFrame()  # Acesso aberto a todos arquivos
+default_params = pd.DataFrame([{"Idioma_padrao": "portuguese",
+                                "IdDataSetDefault": 0}])
 # Por agora salva o global por padrão mesmo!
 # Salva o estado do metadataset atual
 def save_mdt(df_mdt: pd.DataFrame):
     df_mdt.to_csv("save_state/save_principal", index=False)
 
 
-def _read_config():
+def _read_params():
     if 'params.json' in glob.glob(""):
         return pd.read_json('params.json')
     else:
@@ -37,12 +39,10 @@ def load_mdt(arq = 'save_principal'):
         print(f"Não há arquivo '{arq}' no diretório 'save_state'")
         return pd.DataFrame()
 
-
 #
 # Vê se tem save para carregar
 #
 # def inicializar():
-df_metadatasets = pd.DataFrame()
 print(glob.glob("save_state/*"))
 if 'save_state/save_principal' in glob.glob("save_state/*"):
     df_metadatasets = load_mdt()

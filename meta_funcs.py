@@ -112,5 +112,24 @@ def exibir_datasets():
     """
     Exibe os datasets registrados no DataFrame de registro de datasets principal
     """
-    print(imps.df_metadatasets)
+    print(f"Datasets registrados\n\n{imps.df_metadatasets}\n\n")
     return True
+
+
+def selecionar_dataset(inp: int = -1):
+    exibir_datasets()
+    # Verifica se hpa algum dataset a ser selecionado
+    if imps.df_metadatasets.empty:
+        print("Não há datasets para serem selecionados")
+        return -1
+    while inp == -1:
+        inp = input("Seleciona o ID do dataset: ")
+        if inp.isnumeric():
+            inp = int(inp)
+            if inp >= 0 and inp < imps.df_metadatasets.shape[0]:
+                break
+        
+        # Caso não saia da função
+        print("Valor inválido")
+        inp = -1
+    return inp

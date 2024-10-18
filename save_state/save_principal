@@ -1,4 +1,5 @@
 Nome,Caminho,Separador,Campo,Idioma
-Teste,datasets/teste_objects_description_pt.csv,",",description,english
-DataSet de Teste,datasets/teste_movies_synopsis_extended.csv,",",synopsis,english
-Teste,datasets/descricao_sistema_harmonizado_ncm.csv,;,NO_NCM_POR,portuguese
+DataSet Principal,datasets/descricao_sistema_harmonizado_ncm.csv,;,NO_NCM_POR,portuguese
+RegA,datasets/mpst_full_data.csv,",",title,english
+Reg B,datasets/mpst_full_data.csv,",",plot_synopsis,english
+Reg Andre,datasets/imdb_movies.csv,",",overview,english
