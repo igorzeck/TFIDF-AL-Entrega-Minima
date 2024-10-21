@@ -1,6 +1,7 @@
 import nltk
 import glob
 import pandas as pd
+import numpy as np
 # from collections import Counter
 # from itertools import chain
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer

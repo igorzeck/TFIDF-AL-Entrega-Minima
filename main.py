@@ -1,6 +1,7 @@
 import imp_setup as imps
 import meta_funcs
-import tfidf_csv
+import tfidf_sklearn
+import tfidf_manual
 
 # 
 # Menu de seleção
@@ -9,13 +10,14 @@ import tfidf_csv
 # TODO: Consertar launch.json para sempre rodar o main.py
 # TODO: Mostrar só campo e similaridade? Adicionar para que possa mostrar tabela acima?
 ops = [("Registrar DataSet", meta_funcs.registrar_dataset),
-        ("Rodar", tfidf_csv.rodar_nltk),
+        ("Rodar", tfidf_sklearn.rodar_nltk),
         ("Datasets registrados", meta_funcs.exibir_datasets),
         ("Sair", lambda: False)]
 
 ops_l = [x[0].lower() for x in ops]
 
 while True:
+    print()
     # Verifica se há datasets, senão seleciona o padrão
     # Seleciona configurações padrões por agora
     selecao = True
@@ -32,7 +34,7 @@ while True:
         else:
             # Por agora não aceita strings
             continue
-        if not ops[inp][1]():
+        if not ops[min(inp, len(ops) - 1)][1]():
             # break
             break
     else:
@@ -41,5 +43,5 @@ while True:
             print("O Dataset está vazio!")
         else:
             print(f"Dataset {imps.df_metadatasets.loc[imps.default_params["IdDataSetDefault"], "Nome"][0]} selecionado!")
-        if not tfidf_csv.rodar_nltk(imps.default_params["IdDataSetDefault"][0]):
+        if not tfidf_sklearn.rodar_nltk(imps.default_params["IdDataSetDefault"][0]):
             break

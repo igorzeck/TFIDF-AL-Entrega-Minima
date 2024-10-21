@@ -2,10 +2,33 @@
 # Funções de registro
 # 
 import csv
+import re
 import imp_setup as imps
 from imp_setup import pd, stopwords, glob
 
-# lista_col = ["Nome", "Caminho", "Separador", "Campo", "Idioma"]
+#
+# Variáveis globais
+#
+sw = set()
+
+
+#
+# Funções
+#
+def limpar_str(texto: str):
+    global sw
+    texto = texto.lower()
+    temp_texto = []
+    # Retira todo e qualquer caractere especial (incluindo UNICODE)
+    pals = re.sub(r'[^\w\s]|_', ' ', texto, flags=re.UNICODE).split()
+    for pal in pals:
+        if pal not in sw:
+            if pal.isalnum():
+                temp_texto.append(pal)
+            else:
+                temp_texto.append(" ")
+    return ' '.join(temp_texto)
+
 
 # Detecção de separadores
 def detectar_separador(arquivo_csv):
@@ -59,13 +82,21 @@ def _reg_campo(dict_inp: dict):
 
     # print(df_mestre)
     print(" - Campos - ")
+    col_n = 0
     for i, campo in enumerate(df_mestre.columns.to_list()):
         print(f"{i:<4} {campo}")
+        col_n += 1
     
     col_texto = None
-    while (col_texto == None) or (col_texto not in df_mestre.columns):
-        col_texto = input("Campo: ")
-    
+    while not col_texto:
+        inp = input("Campo: ")
+        if not inp.isnumeric():
+            if not df_mestre.columns[df_mestre.columns == inp].empty:
+                col_texto = df_mestre.columns[df_mestre.columns == inp][0]
+        else:
+            inp = int(inp)
+            if (inp >= 0 and inp < col_n):
+                col_texto = df_mestre.columns[inp]
     print(f"Coluna '{col_texto}' selecionada!")
     return col_texto
 
@@ -84,6 +115,7 @@ def _reg_idioma(_):
 
 
 
+# TODO: Detectar idioma utilizando idioma?
 def registrar_dataset():
     dict_op = {
         "Nome": lambda _: input("Nome do registro: "),
@@ -112,7 +144,7 @@ def exibir_datasets():
     """
     Exibe os datasets registrados no DataFrame de registro de datasets principal
     """
-    print(f"Datasets registrados\n\n{imps.df_metadatasets}\n\n")
+    print(f"\n- Datasets registrados -\n\n{imps.df_metadatasets}\n")
     return True
 
 
