@@ -7,11 +7,16 @@ import tfidf_manual
 # Menu de seleção
 # 
 # TODO: Nome do registro no final ou depois de selecionr arquivo
-# TODO: Consertar launch.json para sempre rodar o main.py
-# TODO: Mostrar só campo e similaridade? Adicionar para que possa mostrar tabela acima?
+# TODO: Escolher campos para mostrar, além da similaridade (default é "Campo" do texto)
+# TODO: Registro rápido ou completo
+# TODO: Fallback para rodar arquivos tfidf standalone
+def executar_busca(index: int = -1) -> bool:
+    return tfidf_manual.rodar_manual(index) if imps.default_params["Modo"] == "Manual" else tfidf_sklearn.rodar_nltk(index)
+
 ops = [("Registrar DataSet", meta_funcs.registrar_dataset),
-        ("Rodar", tfidf_sklearn.rodar_nltk),
+        ("Rodar", executar_busca),
         ("Datasets registrados", meta_funcs.exibir_datasets),
+        (f"Mudar modo TFIDF (Manual <-> Sci-kit)", meta_funcs.mudar_modo),
         ("Sair", lambda: False)]
 
 ops_l = [x[0].lower() for x in ops]
@@ -23,6 +28,7 @@ while True:
     selecao = True
     if (not imps.default_params["IdDataSetDefault"].isin(imps.df_metadatasets.index).any())\
           or selecao:
+        print("Modo atual:", imps.default_params["Modo"][0])
         print("Escolha uma das opções: ")
     # TODO: Melhorar isso
     # TODO: Criar menu de seleção de DataSets

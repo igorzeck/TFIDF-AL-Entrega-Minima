@@ -125,7 +125,8 @@ def inverse_doc_f(l_vect, suav=True, modo_garcia=False):
     return l_idfs
 
 
-def tfidf(*args, suav_idf=False, modo_garcia=False, rel_tf=True):
+# TODO: Normalizar os vetores do TFIDF
+def tfidf(*args, suav_idf=False, modo_garcia=False, rel_tf=True, norm=True):
     """
     Aceita lista com strings limpas, lista com dimensões nesta ordem
     ou TF, IDF nesta ordem
@@ -154,7 +155,7 @@ def tfidf(*args, suav_idf=False, modo_garcia=False, rel_tf=True):
 # 
 # Ciclo principal
 # 
-def rodar_manual(index: int = -1):
+def rodar_manual(index: int):
     print("\n\n- Modo manual - \n\n")
     # Seleção dos datasets
     if index == -1:

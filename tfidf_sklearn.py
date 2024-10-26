@@ -19,7 +19,7 @@ meta.sw = set()
 #
 # Funções
 #
-def rodar_nltk(index: int = -1):
+def rodar_nltk(index: int):
     print("\n\n- Modo Sci-kit e NLTK - \n\n")
     if index == -1:
         index = selecionar_dataset(index)
@@ -102,6 +102,7 @@ def _criar_tf_nltk(l_limpa_com_query: list, df_mestre: pd.DataFrame):
     # df_top_x = df_top_x.loc[df_top_x.index, [col_texto, "Similaridade"]]
 
 
+# TODO: Mudar para Transformer!
 def _criar_tfidf_nltk(l_limpa_com_query: list, df_mestre: pd.DataFrame):
     """
     Cria term frequency e inverse document frequency (tf-idf) dos termos contidos no df_mestre

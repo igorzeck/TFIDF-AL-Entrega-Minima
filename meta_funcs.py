@@ -114,18 +114,77 @@ def _reg_idioma(_):
     return op_clean
 
 
+def _reg_imagem(dict_inp: dict):
+    df_mestre = pd.read_csv(dict_inp["Caminho"], sep=dict_inp["Separador"])
+    return selecionar_op(
+        df_mestre.to_dict(),
+        "Selecione o campo contendo o caminho das imagems",
+        retorno="Chave"
+    )
+
+
+
+def mudar_modo():
+    """
+    Muda modo de "Manual" para "Sci-kit" ou vice-versa
+    """
+    modo_atual = imps.default_params["Modo"][0]
+    imps.default_params["Modo"] = "Sci-kit" if modo_atual == "Manual" else "Manual"
+    return True
+
+
+def selecionar_op(ops: dict, preamble: str, query: str = ": ", retorno: str = "Valor"):
+    """
+    Exibe e seleciona as opções de um dicionário, variável 'retorno' define o que retornar
+    Se retorna 'Valor', 'Chave' ou 'Retorno' (para o retorno de uma função no dicionário)
+    """
+    print(preamble)
+    # Exibição
+    for i_op, op in enumerate(ops):
+        print(f"{i_op:<2} - {op}")
+    
+    while True:
+        inp = input(query).lower()
+        for i_op, op in enumerate(ops):
+            print(op.lower(), i_op)
+            if (op.lower() == inp) or (inp == str(i_op)):
+                if retorno == "Retorno":
+                    return ops[op]() # Retorna resultado
+                elif retorno == "Valor":
+                    return ops[op]
+                elif retorno == "Chave":
+                    return op  # Retorna chave
+
+
 
 # TODO: Detectar idioma utilizando idioma?
 def registrar_dataset():
+    dict_modo = {"Direto": True,
+                 "Indireto": False}
+
     dict_op = {
-        "Nome": lambda _: input("Nome do registro: "),
         "Caminho": _reg_caminho,
         "Separador": _reg_sep,
         "Campo": _reg_campo,
-        "Idioma": _reg_idioma
+        "Idioma": _reg_idioma,
+        "Imagem": _reg_imagem,
+        "Nome": lambda _: input("Nome do registro: "),
     }
+
+    modo_direto = selecionar_op(
+                  dict_modo,
+                  "Modo rápido (Direto) ou (Indireto) de registro?"
+                  )
+
     linha_dict = {}
     for k in dict_op.keys():
+        if modo_direto:
+            if k == "Nome":
+                linha_dict[k] = linha_dict["Caminho"]
+                continue
+            if k == "Imagem":
+                linha_dict[k] = None
+                continue
         ret_val = dict_op[k](linha_dict)
         if ret_val:
             linha_dict[k] = ret_val

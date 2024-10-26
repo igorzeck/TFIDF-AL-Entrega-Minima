@@ -1,10 +1,2 @@
-Nome,Caminho,Separador,Campo,Idioma
-DataSet Principal,datasets/descricao_sistema_harmonizado_ncm.csv,;,NO_NCM_POR,portuguese
-RegA,datasets/mpst_full_data.csv,",",title,english
-Reg B,datasets/mpst_full_data.csv,",",plot_synopsis,english
-Reg Andre,datasets/imdb_movies.csv,",",overview,english
-Teste manual,datasets/teste_csv_exemplo.csv,",",Texto,portuguese
-Reg Teste,datasets/Books.csv,",",Book-Title,english
-Reg_teste,datasets/teste_objects_description.csv,",",description,english
-Books curto,datasets/Books.csv,",",Book-Title,english
-Books reg 1,datasets/Books_simplificado.csv,",",Book-Title,english
+Nome,Caminho,Separador,Campo,Idioma,Imagem
+DataSet Principal,datasets/descricao_sistema_harmonizado_ncm.csv,;,NO_NCM_POR,portuguese,

@@ -14,7 +14,8 @@ from nltk.corpus import stopwords
 #
 df_metadatasets = pd.DataFrame()  # Acesso aberto a todos arquivos
 default_params = pd.DataFrame([{"Idioma_padrao": "portuguese",
-                                "IdDataSetDefault": 0}])
+                                "IdDataSetDefault": 0,
+                                "Modo": "Sci-kit"}])
 # Por agora salva o global por padrão mesmo!
 # Salva o estado do metadataset atual
 def save_mdt(df_mdt: pd.DataFrame):
