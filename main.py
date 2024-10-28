@@ -1,17 +1,13 @@
 import imp_setup as imps
 import meta_funcs
-import tfidf_sklearn
-import tfidf_manual
+import set_sklearn
+import set_manual
 
 # 
 # Menu de seleção
 # 
-# TODO: Nome do registro no final ou depois de selecionr arquivo
-# TODO: Escolher campos para mostrar, além da similaridade (default é "Campo" do texto)
-# TODO: Registro rápido ou completo
-# TODO: Fallback para rodar arquivos tfidf standalone
 def executar_busca(index: int = -1) -> bool:
-    return tfidf_manual.rodar_manual(index) if imps.default_params["Modo"] == "Manual" else tfidf_sklearn.rodar_nltk(index)
+    return set_manual.rodar_manual(index) if imps.default_params["Modo"][0] == "Manual" else set_sklearn.rodar_nltk(index)
 
 ops = [("Registrar DataSet", meta_funcs.registrar_dataset),
         ("Rodar", executar_busca),
@@ -30,7 +26,6 @@ while True:
           or selecao:
         print("Modo atual:", imps.default_params["Modo"][0])
         print("Escolha uma das opções: ")
-    # TODO: Melhorar isso
     # TODO: Criar menu de seleção de DataSets
         for i, op in enumerate(ops):
             print(f"{i:<2} - {op[0]}")
@@ -49,5 +44,5 @@ while True:
             print("O Dataset está vazio!")
         else:
             print(f"Dataset {imps.df_metadatasets.loc[imps.default_params["IdDataSetDefault"], "Nome"][0]} selecionado!")
-        if not tfidf_sklearn.rodar_nltk(imps.default_params["IdDataSetDefault"][0]):
+        if not set_sklearn.rodar_nltk(imps.default_params["IdDataSetDefault"][0]):
             break

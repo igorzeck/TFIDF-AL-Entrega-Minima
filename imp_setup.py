@@ -45,7 +45,7 @@ def load_mdt(arq = 'save_principal'):
 # Vê se tem save para carregar
 #
 # def inicializar():
-print(glob.glob("save_state/*"))
+# print(glob.glob("save_state/*"))
 if 'save_state/save_principal' in glob.glob("save_state/*"):
     df_metadatasets = load_mdt()
-    print(df_metadatasets)
+    # print(df_metadatasets)

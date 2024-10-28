@@ -1,2 +1,4 @@
-Nome,Caminho,Separador,Campo,Idioma,Imagem
-DataSet Principal,datasets/descricao_sistema_harmonizado_ncm.csv,;,NO_NCM_POR,portuguese,
+Nome,Caminho,Separador,Campo,Idioma,Imagem,Exibir,Recomendar
+Descricao objetos,datasets/teste_objects_description.csv,",",description,english,,Similaridade name description,True
+datasets/Books.csv,datasets/Books.csv,",",Book-Title,english,,Similaridade Book-Title,False
+datasets/descricao_sistema_harmonizado_ncm.csv,datasets/descricao_sistema_harmonizado_ncm.csv,;,NO_NCM_POR,portuguese,,Similaridade NO_NCM_POR,False

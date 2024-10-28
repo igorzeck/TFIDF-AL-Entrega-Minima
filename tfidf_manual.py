@@ -1,14 +1,41 @@
-import imp_setup as imps
-import meta_funcs as meta
-from imp_setup import pd, stopwords
-from meta_funcs import selecionar_dataset, limpar_str
+# 
+# -- Importações --
+#
+import re
 import math
+if __name__ == "__main__":
+    import pandas as pd
+    import nltk
+    nltk.download('stopwords')  # Não baixa se já estiver atualizado!
+    from nltk.corpus import stopwords
+else:
+    import imp_setup as imps
+    import meta_funcs as meta
+    from imp_setup import pd, stopwords
+    from meta_funcs import selecionar_dataset
 
+#
+# -- Variáveis --
+#
+sw = set()
 
 #
 # -- Funções --
 #
-# TODO: Corrigir formatação docstring
+def limpar_str(texto: str):
+    global sw
+    texto = texto.lower()
+    temp_texto = []
+    # Retira todo e qualquer caractere especial (incluindo UNICODE)
+    pals = re.sub(r'[^\w\s]|_', ' ', texto, flags=re.UNICODE).split()
+    for pal in pals:
+        if pal not in sw:
+            if pal.isalnum():
+                temp_texto.append(pal)
+            else:
+                temp_texto.append(" ")
+    return ' '.join(temp_texto)
+
 
 #
 # Funções de auxílio
@@ -74,21 +101,17 @@ def dimensionar(lista_limpa) -> tuple:
     return tuple(dimen_set)
 
 
-def arr_bowrizar(lista_limpa, lista_dimen=[]):
+def arr_bowrizar(lista_limpa, lista_dimen):
     """
     Gera, a partir de um array (coleção), lista Bag of Words (BOW)
-    Elementos são Term Frequency (TF) Raw (contangem absoluta por documento)\n
-    <h2>Parâmetros</h2>
-    **lista_limpa**:Lista com elementos de onde será formada a Bag of Words\n
-    **lista_dimen**:Lista com dimensões (tokens), se não for passada será criada
+    Elementos são Term Frequency (TF) Raw (contangem absoluta por documento)
     """
     arr_dimen = []
-    if lista_dimen:
-        lista_dimen = dimensionar(lista_limpa)
     for doc in lista_limpa:
         vect = []
+        doc_list = doc.split(" ")
         for token in lista_dimen:
-            vect.append(doc.count(token))
+            vect.append(doc_list.count(token))
         arr_dimen.append(vect)
     return arr_dimen
 
@@ -125,21 +148,17 @@ def inverse_doc_f(l_vect, suav=True, modo_garcia=False):
     return l_idfs
 
 
-# TODO: Normalizar os vetores do TFIDF
-def tfidf(*args, suav_idf=False, modo_garcia=False, rel_tf=True, norm=True):
+def tfidf(*args, suav_idf=True, modo_garcia=False, rel_tf=False):
     """
-    Aceita lista com strings limpas, lista com dimensões nesta ordem
+    Aceita lista com strings limpas e lista com dimensões nesta ordem
     ou TF, IDF nesta ordem
-        <h2>Parâmetros</h2>
-            \n>
-            **modo_garcia** (*bool*): Se True fórmula exata da aula.
-            \n>
-            **rel_tf** (*bool*): Se False, tf é frequência absoluta e se True é relativo a dimensão (frequência relativa)
     """
-    # TODO: Arrumar isso
     if isinstance(args[0][0], str):  # Por agora essa é a solução
         docs_limpos = args[0]
-        lista_dimen = args[1]
+        if len(args) >= 2:
+            lista_dimen = args[1]
+        else:
+            lista_dimen = dimensionar(docs_limpos)
         arr_bow_ = arr_bowrizar(docs_limpos, lista_dimen)
         tf_ = term_frequency(arr_bow_, rel_tf)
         idf_ = inverse_doc_f(arr_bow_, suav_idf, modo_garcia)
@@ -148,84 +167,57 @@ def tfidf(*args, suav_idf=False, modo_garcia=False, rel_tf=True, norm=True):
         idf_ = args[1]
     l_tfidf_ = []
     for v in tf_:
-        l_tfidf_.append(aplicar_op(v, _multx_, idf_))
+        v_tfidif = aplicar_op(v, _multx_, idf_)
+        l_tfidf_.append(v_tfidif)
+
     return l_tfidf_
 
 
-# 
-# Ciclo principal
-# 
-def rodar_manual(index: int):
-    print("\n\n- Modo manual - \n\n")
-    # Seleção dos datasets
-    if index == -1:
-        index = selecionar_dataset()
-        if index < 0:
-            return False
-    
-    # Limpeza
-    meta.sw = set(stopwords.words(imps.df_metadatasets.loc[index, "Idioma"]))
-    col_texto = imps.df_metadatasets.loc[index, "Campo"]
-    df_mestre = pd.read_csv(imps.df_metadatasets.loc[index, "Caminho"], sep=imps.df_metadatasets.loc[index, "Separador"], low_memory=False)
+def on_start(lang: str):
+    global sw
+    sw = set(stopwords.words(lang))
 
-    df_tinindo = df_mestre.copy()
-    df_tinindo[col_texto] = df_tinindo[col_texto].apply(limpar_str)
 
-    # Query do usuário
-    raw_query = input("Query: ")
+def _fallback_():
+    on_start('portuguese')
+    #path_arq = "datasets/descricao_sistema_harmonizado_ncm.csv"
+    #campo_busca = "NO_NCM_POR"
+    separador = ","
+    path_arq = "datasets/teste_objects_description_pt.csv"
+    campo_busca = "description"
+    try:
+        df = pd.read_csv(path_arq, sep=separador)
+        # df = df[:len(df):10]  # Usa apenas 10% do arquivo
+        # df.reset_index(drop=True, inplace=True)
+    except FileExistsError:
+        print(f"Arquivo {path_arq} não encontrado!")
+        return False
 
-    # Limpeza a query e adição em um DataFrame
-    query = limpar_str(raw_query)
-    lista_tinindo = [query] + df_tinindo[col_texto].to_list()
-    print("Limpeza feito")
+    query = input("\nQuery: ")
 
-    #
-    # BOW
-    #
-    lista_dimen = dimensionar(lista_tinindo)
-    print("Tokens encontrados")
-    bow = arr_bowrizar(lista_tinindo, lista_dimen)
-    print("BOW feito")
+    query = limpar_str(query)
+    df_limpo = df[campo_busca].apply(limpar_str)
+    lista_limpa = [query] + df_limpo.to_list()
+    lista_tfidf = tfidf(lista_limpa)
 
-    #
-    # TF
-    #
-    lista_tf = term_frequency(bow, rel=False)
-    print("TF feito")
-
-    #
-    # IDF
-    #
-    lista_idf = inverse_doc_f(bow, False, False)
-    print("IDF feito")
-
-    #
-    # TF-IDF
-    #
-    lista_tfidf = tfidf(lista_tf, lista_idf)
-    print("TF-IDF feito")
-
-    #
-    # Similaridade de cossenos
-    #
     lista_cos = comp_sim_cos(lista_tfidf, lista_tfidf[0])
-    print("Similaridade do cosseno feito")
+
+    tfidf_df = df.copy()
+    tfidf_df.insert(0, "Similaridade", lista_cos[1:])
+
+    # Coloca coluna no final do DataFrame
+    col_busca = tfidf_df.pop(campo_busca)
+    tfidf_df.join(col_busca)
 
 
-    #
-    # TOP 10 Resultados
-    #
-    df_top_x = pd.DataFrame({"Similaridade":lista_cos[1:],
-                             col_texto:lista_tinindo[1:]})
-    df_top_x.sort_values("Similaridade", ascending=False, inplace=True)
-    df_top_x = df_top_x[0:min(len(df_top_x), 10)]
+    tfidf_df.sort_values("Similaridade", ascending=False, inplace=True)
+    tfidf_df = tfidf_df.head(10)
+    tfidf_df = tfidf_df[tfidf_df["Similaridade"] != 0.0]
 
-    df_top_x = df_top_x[df_top_x["Similaridade"] != 0.0]
+    print(tfidf_df)
 
-    # Exibição
-    if not df_top_x.empty:
-        print("\n-- Top 10 --\n\n", df_top_x)
-    else:
-        print(f"String '{raw_query}' não encontrado!")
     return True
-    
+
+
+if __name__ == "__main__":
+    _fallback_()
