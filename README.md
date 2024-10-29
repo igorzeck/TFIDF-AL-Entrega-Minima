@@ -24,7 +24,7 @@ Arqiuivo _Books_simplificado.csv_ criado pegando 50000 (25%) do arquivo _Books.c
 
 
 ## Passo a passo:
-1. Utilizar um interpretador python com nltk, sklearn, pandas e python-fasthtml, senão `pip install requirements.txt`
+1. Utilizar um interpretador python com nltk, sklearn, pandas e python-fasthtml, senão `pip install -r requirements.txt --user` (`--user` para caso o VS Code não tenha permissão de administrador)
 2. Executar no VS Code ou via cmd por meio de `python main.py`, onde `pyhton`é o interpretador com os módulos acima instalados
 3. Caso a interface não funcione, rodar main.py
 4. Caso main.py apresentar problemas pode se rodar **tfidf_manual.py** e **tfidf_sklearn.py** diretamente.

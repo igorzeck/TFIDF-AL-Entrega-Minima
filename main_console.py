@@ -33,8 +33,7 @@ def main():
             if isinstance(op_ret, pd.DataFrame):
                 if op_ret.empty:
                     break
-            else:
-                if op_ret:
+            elif not op_ret:
                     break
         else:
             print("O Dataset padrão está vazio!")

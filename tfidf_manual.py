@@ -70,7 +70,7 @@ _multx_ = lambda n1, n2: n1 * n2
 #
 # Funções de álgebra
 #
-def prod_escalar(v1, v2) -> int:
+def prod_escalar(v1, v2) -> float:
     """
     Retorna o produto escalar de dois vetores.
     Implicitio que eles tem a mesma dimensão

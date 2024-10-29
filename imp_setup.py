@@ -8,6 +8,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 nltk.download('stopwords')  # Não baixa se já estiver atualizado!
 from nltk.corpus import stopwords
+from os.path import normpath
 
 #
 # Variáveis globais
@@ -21,7 +22,7 @@ default_params = pd.DataFrame([{"Idioma_padrao": "portuguese",
 
 # De estilo
 styles = ""
-with open("res/styles.css", "r", encoding="utf-8") as arq:
+with open(normpath("res/styles.css"), "r", encoding="utf-8") as arq:
     styles = arq.read()
 
 
@@ -43,7 +44,7 @@ def _save_params(dt_params: pd.DataFrame = default_params):
 
 # Carrega o estado do metadataset atual
 def load_mdt(arq = 'save_principal'):
-    if ('save_state/' + arq) in glob.glob(f"save_state/*"):
+    if normpath('save_state/' + arq) in glob.glob(f"save_state/*"):
         return pd.read_csv(f"save_state/{arq}")
     else:
         print(f"Não há arquivo '{arq}' no diretório 'save_state'")
@@ -52,8 +53,5 @@ def load_mdt(arq = 'save_principal'):
 #
 # Vê se tem save para carregar
 #
-# def inicializar():
-# print(glob.glob("save_state/*"))
-if 'save_state/save_principal' in glob.glob("save_state/*"):
+if normpath('save_state/save_principal') in glob.glob("save_state/*"):
     df_metadatasets = load_mdt()
-    # print(df_metadatasets)

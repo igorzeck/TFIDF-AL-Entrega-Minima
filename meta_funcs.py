@@ -47,7 +47,7 @@ def _reg_caminho(dict_inp: dict):
         return False
     
     for i, arq in enumerate(arqs):
-        print(f"{i + 1:<4} {arq.replace("datasets/", "")}")
+        print(f"{i + 1:<4} {arq.replace('datasets/', '')}")
 
     while (op == 0) or (op > max_choice):
         op = input("Escolha o número do dataset a ser usado: ")
@@ -156,7 +156,7 @@ def _reg_matriz(dict_inp: dict):
     if to_reg:
         df_mestre = pd.read_csv(dict_inp["Caminho"], low_memory=False)
         df_sim = exe_tfidf(df_mestre, dict_inp["Campo"], dict_inp["Idioma"])
-        df_sim.to_csv(f"save_state/{dict_inp["Nome"]}")
+        df_sim.to_csv(f"save_state/{dict_inp['Nome']}")
         return True
     else:
         return False
