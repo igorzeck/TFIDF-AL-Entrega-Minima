@@ -28,3 +28,11 @@ Arqiuivo _Books_simplificado.csv_ criado pegando 50000 (25%) do arquivo _Books.c
 2. Executar no VS Code ou via cmd por meio de `python main.py`, onde `pyhton`é o interpretador com os módulos acima instalados
 3. Caso a interface não funcione, rodar main.py
 4. Caso main.py apresentar problemas pode se rodar **tfidf_manual.py** e **tfidf_sklearn.py** diretamente.
+
+## Funcionalidades
+Similaridade manual e também com o Sci-kit.
+
+O projeto tem interface web (que você acessa local por meio de [http://127.0.0.0:5001/]) e também interface em console.
+
+Você pode 'registrar' um dataset que **já esteja** na pasta _datasets_ no repositório do programa e executar uma busca nele (no console é a opção **rodar**).
+
