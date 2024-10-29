@@ -180,15 +180,12 @@ def on_start(lang: str):
 
 def _fallback_():
     on_start('portuguese')
-    #path_arq = "datasets/descricao_sistema_harmonizado_ncm.csv"
-    #campo_busca = "NO_NCM_POR"
-    separador = ","
-    path_arq = "datasets/teste_objects_description_pt.csv"
-    campo_busca = "description"
+    path_arq = "datasets/descricao_sistema_harmonizado_ncm.csv"
+    campo_busca = "NO_NCM_POR"
+    separador = ";"
     try:
         df = pd.read_csv(path_arq, sep=separador)
-        # df = df[:len(df):10]  # Usa apenas 10% do arquivo
-        # df.reset_index(drop=True, inplace=True)
+        df = df[:len(df):10]  # Usa apenas 10% do arquivo
     except FileExistsError:
         print(f"Arquivo {path_arq} não encontrado!")
         return False
@@ -207,17 +204,22 @@ def _fallback_():
 
     # Coloca coluna no final do DataFrame
     col_busca = tfidf_df.pop(campo_busca)
-    tfidf_df.join(col_busca)
+    tfidf_df = tfidf_df.join(col_busca)
 
 
     tfidf_df.sort_values("Similaridade", ascending=False, inplace=True)
     tfidf_df = tfidf_df.head(10)
     tfidf_df = tfidf_df[tfidf_df["Similaridade"] != 0.0]
 
-    print(tfidf_df)
-
-    return True
-
+    return tfidf_df
 
 if __name__ == "__main__":
-    _fallback_()
+    tfidf_df = _fallback_()
+    print("\n-- Top 10 -- \n")
+    print(tfidf_df)
+    count = 1
+    for _, row in tfidf_df.iterrows():
+        print(f"\n -- #{count} --\n")
+        print("Similaridade:", row["Similaridade"],
+            "\nDescrição:", row["NO_NCM_POR"])
+        count += 1

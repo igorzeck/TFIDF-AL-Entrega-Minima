@@ -13,10 +13,18 @@ from nltk.corpus import stopwords
 # Variáveis globais
 #
 df_metadatasets = pd.DataFrame()  # Acesso aberto a todos arquivos
+df_cache = pd.DataFrame()  # Cache de acesso aberto a todos arquivos
+# imps.default_params["IdDataSetDefault"] sempre 0
 default_params = pd.DataFrame([{"Idioma_padrao": "portuguese",
                                 "IdDataSetDefault": 0,
                                 "Modo": "Sci-kit"}])
-# Por agora salva o global por padrão mesmo!
+
+# De estilo
+styles = ""
+with open("res/styles.css", "r", encoding="utf-8") as arq:
+    styles = arq.read()
+
+
 # Salva o estado do metadataset atual
 def save_mdt(df_mdt: pd.DataFrame):
     df_mdt.to_csv("save_state/save_principal", index=False)

@@ -19,20 +19,23 @@ meta.sw = set()
 #
 # Funções
 #
-def rodar_nltk(index: int):
+def rodar_sklearn(index: int, raw_query=""):
     print("\n\n- Modo Sci-kit e NLTK - \n\n")
+    df_top_x = pd.DataFrame()
     if index == -1:
         index = selecionar_dataset(index)
         if index < 0:
-            return False
+            return df_top_x
 
     df_mestre = pd.read_csv(imps.df_metadatasets.loc[index, "Caminho"], sep=imps.df_metadatasets.loc[index, "Separador"], low_memory=False)
 
     # Pega a query do usuário
-    raw_query = input("Query: ")
+    while not raw_query:
+        raw_query = input("Query: ")
+    
     if not raw_query:
         print("Input inválido")
-        return False
+        return df_top_x
     #
     # TF-IDF
     #
@@ -41,6 +44,7 @@ def rodar_nltk(index: int):
                         imps.df_metadatasets.loc[index, "Campo"],
                         imps.df_metadatasets.loc[index, "Idioma"],
                         raw_query)
+    # TODO: Arrumar para caso a query esteja vazia!
     df_mestre["Similaridade"] = df_sim[1:].reset_index(drop=True)
 
     #
@@ -57,4 +61,5 @@ def rodar_nltk(index: int):
         print("\n-- Top 10 --\n\n", df_top_x)
     else:
         print(f"String '{raw_query}' não encontrado!")
-    return True
+    
+    return df_top_x

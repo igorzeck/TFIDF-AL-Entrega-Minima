@@ -9,13 +9,14 @@ from tfidf_manual import *
 # 
 # Ciclo principal
 # 
-def rodar_manual(index: int):
+def rodar_manual(index: int, query=""):
     print("\n\n- Modo manual - \n\n")
+    df_top_x = pd.DataFrame()
     # Seleção dos datasets
     if index == -1:
         index = selecionar_dataset()
         if index < 0:
-            return False
+            return df_top_x
 
     # Setup
     on_start(imps.df_metadatasets.loc[index, "Idioma"])
@@ -23,16 +24,18 @@ def rodar_manual(index: int):
     df_mestre = pd.read_csv(imps.df_metadatasets.loc[index, "Caminho"], sep=imps.df_metadatasets.loc[index, "Separador"], low_memory=False)
     if len(df_mestre) > 1000:
         # Abre apenas 1000 entries (igualmente espaçadas)
+        print("Dataset tem mais de 1000 linahs!\n"
+              "Abrindo apenas 1000 linhas (ao longo do documento)\n")
         n_row = len(df_mestre)
         df_mestre = df_mestre[:n_row:int(n_row/1000)]
-        df_mestre.reset_index(drop=True, inplace=True)
 
     # Limpeza
     df_tinindo = df_mestre.copy()
     df_tinindo[col_texto] = df_tinindo[col_texto].apply(limpar_str)
 
     # Query do usuário
-    raw_query = input("Query: ")
+    while not query:
+        raw_query = input("Query: ")
 
     # Limpeza a query e adição em um DataFrame
     query = limpar_str(raw_query)
@@ -88,5 +91,6 @@ def rodar_manual(index: int):
         print("\n-- Top 10 --\n\n", df_top_x)
     else:
         print(f"String '{raw_query}' não encontrado!")
-    return True
+    
+    return df_top_x
     

@@ -12,7 +12,9 @@ from tfidf_sklearn import exe_tfidf
 #
 sw = set()
 
-
+#
+# Funções
+#
 # Detecção de separadores
 def detectar_separador(arquivo_csv):
     with open(arquivo_csv, 'r', encoding='utf-8') as f:
@@ -171,6 +173,25 @@ def _reg_nome(dict_inp: dict):
             return inp_nome
 
 
+def _reg_descricao(_):
+    return input("Breve descrição do dataset\n: ")
+
+
+def get_reg_ops():
+    dict_op = {
+        "Caminho": _reg_caminho,
+        "Separador": _reg_sep,
+        "Campo": _reg_campo,
+        "Idioma": _reg_idioma,
+        "Exibir": _reg_exibir,
+        "Imagem": _reg_imagem,
+        "Nome": _reg_nome,
+        "Descricao": _reg_descricao,
+        "Recomendar": _reg_matriz,
+    }
+    return dict_op
+
+
 def mudar_modo():
     """
     Muda modo de "Manual" para "Sci-kit" ou vice-versa
@@ -202,23 +223,14 @@ def selecionar_op(ops: dict, preamble: str, query: str = ": ", retorno: str = "V
                     return op  # Retorna chave
         if inp == "":
             break
+        print("Opção inválida!")
     return False
 
 
 def registrar_dataset():
     dict_modo = {"Direto": True,
                  "Completo": False}
-
-    dict_op = {
-        "Caminho": _reg_caminho,
-        "Separador": _reg_sep,
-        "Campo": _reg_campo,
-        "Idioma": _reg_idioma,
-        "Exibir": _reg_exibir,
-        "Imagem": _reg_imagem,
-        "Nome": _reg_nome,
-        "Recomendar": _reg_matriz,
-    }
+    dict_op = get_reg_ops()
 
     modo_direto = selecionar_op(
                   dict_modo,
@@ -240,16 +252,20 @@ def registrar_dataset():
             if k == "Recomendar":
                 linha_dict[k] = False
                 continue
+            if k == "Descricao":
+                linha_dict[k] = ""
+                continue
         ret_val = dict_op[k](linha_dict)
         if ret_val:
             linha_dict[k] = ret_val
     
     # Adição da linha contendo os metadatasets
-    imps.df_metadatasets = pd.concat([imps.df_metadatasets, pd.DataFrame([linha_dict])], ignore_index=True)
+    df_criado = pd.DataFrame([linha_dict])
+    imps.df_metadatasets = pd.concat([imps.df_metadatasets, df_criado], ignore_index=True)
     print(imps.df_metadatasets.iloc[-1])
     imps.save_mdt(imps.df_metadatasets)
     print("Registro completo!")
-    return True
+    return df_criado
 
 
 def exibir_datasets():
