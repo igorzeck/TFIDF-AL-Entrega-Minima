@@ -1,1 +1,4 @@
 teste*
+datasets/*
+!CNN_Articels_clean.csv
+!descricao_sistema_harmonizado_ncm.csv

@@ -15,17 +15,21 @@ index = 0
 cache_dict = {}
 
 # TODO: Página com resultado dos registros
+# TODO: Página confirmando criação de dataset
+# TODO: Utilizar o campo de descrição para poder fazer buscas nos metadatasets
 @app.get("/")
 def home(query: str = ""):
     df = pd.DataFrame()
     if index != -1:
         df_nome = imps.df_metadatasets.iloc[index]["Nome"]
+        df_desc = imps.df_metadatasets.iloc[index]["Descricao"]
 
     if query:
         df = rodar_sklearn(index, query)
     elif index == -1:
         df = imps.df_metadatasets.copy()
         df_nome = "Datasets"
+        df_desc = "Datasets registrados."
 
     tab = Table(eval(html2ft(df.to_html())))
 
@@ -33,10 +37,11 @@ def home(query: str = ""):
                 Style(imps.styles),
                 H1("Buscar", cls="h1"),
                 P("Dataset ", B(f'{df_nome}', style="color: #4CAF50"), " selecionado!"),
+                P("Descrição: ", df_desc),
                 Div(
                     Form(
                         Button("Registrar dataset"),
-                        action="/registrar_dataset_1", method="get",
+                        action="/registrar", method="get",
                         cls="h-item-form"
                     ),
                     Form(
@@ -76,76 +81,97 @@ def set_query(data:str):
 #
 # Registro de Datasets
 #
-@app.get("/registrar_dataset_1")
-def registrar_dataset_1(passo: int = 1):
-    title_doc = Title("Selecionar Dataset")
-    inp_list = [
-        Div(
-            P("Dataset"),
+@app.get("/registrar")
+def registrar_dataset():
+    title_doc = Title("Registrar Dataset")
+    inp_list = []
+    sep_ = None
+    cam_ = None
+    finalizavel = False
+
+    # Caminho (pra caso tenha sido registrado)
+    if "col_Caminho" in cache_dict:
+        cam_ = cache_dict["col_Caminho"]
+
+    if "col_Separador" in cache_dict:
+        sep_ = cache_dict["col_Separador"]
+        if "dt_Caminho" not in cache_dict:
+            cache_dict["dt_Caminho"] = pd.read_csv(cam_, sep=sep_)
+    elif "col_Caminho" in cache_dict:
+        sep_ = meta.detectar_separador(cache_dict["col_Caminho"])
+
+    # Dataset
+    div_dataset = Div(
+        P("Dataset"),
             Select(
-                *[Option(dt, value=dt) for dt in glob.glob("datasets/*")],
-                name="caminho"
-            )
-        ),]
-
-    main_doc = Main(
-        Style(imps.styles),
-        H1("Registrar datasets"),
-        Div(
-            Form(
-                *inp_list,
-                Button("Confirmar", type="submit"),
-                action="/registrar_1", method="post",
-                cls="search-container",
-            )
-        )
-    )
-
-    return title_doc, main_doc
-
-
-@app.get("/registrar_dataset_2")
-def registrar_dataset_2():
-    title_doc = Title("Selecionar Dataset")
-    inp_list = [
-        Div(
-            P("Separador"),
-            P("',' detectada!"),
-            Input(
-                  type="text",
-                  name="separador",
-                  placeholder=f";")
+                *[Option(dt, value=dt, selected=(True if dt == cam_ else False)) for dt in glob.glob("datasets/*")],
+                name="col_Caminho"
         ),
-        Div(
+    )
+    inp_list.append(div_dataset)
+
+    # Separador
+    if "col_Caminho" in cache_dict:
+        sep_ 
+        div_sep = Div(
+            P("Separador"),
+            P(f"Separador detetado: '{sep_}'"),
+            Input(name="col_Separador", value=sep_),
+            )
+        inp_list.append(div_sep)
+    
+    if "col_Separador" in cache_dict:
+        # Campo de comparação
+        div_campo_idioma = Div(
             P("Campo"),
             Select(
-                *[Option(campo, value=campo) for campo in imps.df_cache.columns],
-                name="idioma"
+                *[Option(campo, name=f"col_Campo_{campo}", value=campo) for campo in cache_dict["dt_Caminho"].columns],
+                name="col_Campo"
             ),
             P("Idioma"),
             Select(
-                *[Option(lang, value=lang) for lang in meta.stopwords.fileids()],
-                name="idioma"
+                *[Option(lang, name=f"col_Idioma_{lang}", value=lang) for lang in meta.stopwords.fileids()],
+                name="col_Idioma"
             ),
-            cls="horizontal-container"
-        ),
-        Div(
-            P("Campo da imagem"),
-            Select(
-                *[Option(campo, value=campo) for campo in imps.df_cache.columns],
-                name="imagem"
-            ),
-        ),
-        Div(
-            P("Quantidade de campos para exibir"),
-            P("*Além da coluna 'Similaridade'"),
-            Select(
-                *[Option(i_, value=i_) for i_ in range(1, len(imps.df_cache.columns))],
-                name="qte_exibir",
-                type="number",
-            ),
+            cls="search-container"
         )
-    ]
+        inp_list.append(div_campo_idioma)
+
+        # Colunas
+        div_exibir = Div(
+            P("Exibir"),
+            *[Input(campo, name=f"col_Exibir_{campo}", value=campo, type="checkbox") for campo in cache_dict["dt_Caminho"].columns],
+            cls="search-container"
+        )
+        inp_list.append(div_exibir)
+
+        # Campo da Imagem
+        div_imagem = Div(
+            P("Campo da Imagem"),
+            Select(
+                Option(None, value="Nan"),
+                *[Option(campo, name=f"col_Imagem_{campo}", value=campo) for campo in cache_dict["dt_Caminho"].columns],
+                name="col_Imagem"
+            ),
+            cls="search-container"
+        )
+        inp_list.append(div_imagem)
+
+        # Campo do Nome
+        div_final = Div(
+            P("Nome"),
+            Input(name="col_Nome"),
+            P("Descrição"),
+            Input(name="col_Descricao"),
+            P("Matriz de recomendações?"),
+            Select(
+                Option("Não", value="False"),
+                Option("Sim", value="True")
+            )
+        )
+        inp_list.append(div_final)
+        finalizavel = True
+
 
     main_doc = Main(
         Style(imps.styles),
@@ -153,9 +179,14 @@ def registrar_dataset_2():
         Div(
             Form(
                 *inp_list,
-                Button("Confirmar", type="submit"),
-                action="/registrar_2", method="post",
+                Button(("Registrar" if finalizavel else "Próximo"), type="submit"),
+                action="/registrar_info_dataset", method="post",
                 cls="search-container",
+            ),
+            Form(
+                Button("Limpar registro", type="submit"),
+                action="limpar_registro", method="post",
+                cls="search-container"
             )
         )
     )
@@ -163,47 +194,45 @@ def registrar_dataset_2():
     return title_doc, main_doc
 
 
-@app.get("/registrar_dataset_3")
-def registrar_dataset_3():
-    title_doc = Title("Selecionar Dataset")
-    if "qte_exibir" in cache_dict.keys():
-        qte_exibir = cache_dict["qte_exibir"]
-    else:
-        print("Cache perdido!")
+#
+# Posts
+#
+@app.post("/registrar_info_dataset")
+def registrar_info_dataset(campos: dict):
+    global cache_dict
+    # Acúmulo de informações temporárias
+    for campo in campos:
+        cache_dict[campo] = campos[campo]
+    if "col_Nome" in cache_dict:
+        dt_temp_reg = pd.DataFrame(columns=imps.df_metadatasets.columns)
+        dt_temp_reg.loc[0, "Exibir"] = "Similaridade"
+        
+        # Retirada das informações do campo
+        for campo in campos:
+            campo_info = campo.split("_")
+            campo_val = campo_info[1]
+            if campo_val in dt_temp_reg.columns: 
+                if campo_val != "Exibir":
+                    dt_temp_reg[campo_val] = campos[campo]
+                else:
+                    dt_temp_reg.loc[0, "Exibir"] += " " + cache_dict[campo]
+        
+        # Registro do Dataset
+        imps.df_metadatasets = pd.concat([imps.df_metadatasets, dt_temp_reg], ignore_index=True)
+        imps.save_mdt(imps.df_metadatasets)
+        cache_dict = dict()
+        print("Registro completo!")
         return home()
-    ops = [op for op in meta.get_reg_ops()][6:]
-    inp_list = [
-        Div(
-            P(f"Exibir {i + 1}"),
-            Select(
-                *[Option(campo, value=campo) for campo in imps.df_cache.columns],
-                name=f"campo_{i + 1}",
-            )
-        )
-        for i in range(qte_exibir)
-    ] + [
-        Div(
-            P(op),
-            Input(type="text", name=f"{op}".lower().replace(" ", "_"), placeholder=f"{op}"),
-            )
-        for op in ops
-    ]
+    else:
+        return registrar_dataset()
+        
 
-    main_doc = Main(
-        Style(imps.styles),
-        H1("Registrar datasets"),
-        Div(
-            Form(
-                *inp_list,
-                Button("Confirmar", type="submit"),
-                action="/registrar_3", method="post",
-                cls="search-container",
-            )
-        )
-    )
-
-    return title_doc, main_doc
-
+@app.post("/limpar_registro")
+@app.post("/limpar_cahce")
+def limpar_registro():
+    global cache_dict
+    cache_dict = dict()
+    return registrar_dataset()
 
 #
 # Seleção e visualização de datasets
@@ -232,60 +261,6 @@ def selecionar_dataset():
 def set_dataset(data:int):
     global index
     index = data
-    return home()
-
-
-@app.post("/registrar_1")
-def registrar_1(caminho: str):
-    global df_novo
-    if (caminho == ""):
-        print("Inválido!")
-        return home()
-    else:
-        df_novo = pd.DataFrame({"Caminho": [caminho]},
-                            columns=imps.df_metadatasets.columns)
-        imps.df_cache = df_novo
-        return registrar_dataset_2()
-
-
-@app.post("/registrar_2")
-def registrar_2(separador: str, idioma: str, qte_exibir: int, imagem: str):
-    global df_novo
-    if idioma == "":
-        print("Inválido!")
-        imps.df_metadatasets = imps.df_metadatasets[:-1]
-        return home()
-    else:
-        # Verifica se campos anteriores obrigatório estão presentres
-        if "Caminho" not in imps.df_cache:
-            print("Perda de informação!")
-            return registrar_dataset_1()
-        imps.df_cache.loc[0, "Separador"] = separador
-        imps.df_cache.loc[0, "Idioma"] = idioma
-        cache_dict["qte_exibir"] = qte_exibir
-        imps.df_cache.loc[0, "Imagem"] = imagem
-        print(imps.df_cache)
-        return registrar_dataset_3()
-
-
-@app.post("/registrar_3")
-def registrar_3(**campos: dict):
-    print(campos)
-    global index
-    if nome == "":
-        print("Inválido!")
-    else:
-        imps.df_cache.loc[0, "Exibir"] = " ".join(campos)
-        imps.df_cache.loc[0, "Nome"] = nome
-        imps.df_cache.loc[0, "Descricao"] = descricao
-        imps.df_cache.loc[0, "Recomendar"] = recomendar
-        imps.df_metadatasets = pd.concat([imps.df_metadatasets, imps.df_cache])
-        imps.df_cache = pd.DataFrame()
-        # Salva registro
-        imps.save_mdt(imps.df_metadatasets)
-        # Seleciona registro
-        index = imps.df_metadatasets.index[-1]
-        print("Registro criado!")
     return home()
 
 

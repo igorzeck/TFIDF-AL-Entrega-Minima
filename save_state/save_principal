@@ -1,3 +1,3 @@
 Nome,Caminho,Separador,Campo,Idioma,Imagem,Exibir,Recomendar,Descricao
-"Nomenclatura Comum do Mercosul",datasets/descricao_sistema_harmonizado_ncm.csv,;,NO_NCM_POR,portuguese,,Similaridade NO_NCM_POR,False,
-Filmes,datasets/imdb_movies.csv,",",overview,english,,Similaridade names overview,,"Dataset com nome e descrição de filmes, em inglẽs"
+Nomenclatura Comum do Mercosul,datasets/descricao_sistema_harmonizado_ncm.csv,;,NO_NCM_POR,portuguese,,Similaridade NO_NCM_POR,False,
+Descrição de objetos,datasets/teste_objects_description.csv,",",description,english,Nan,Similaridade name description,,Dataset com descrição e nome de objetos em inglês.
