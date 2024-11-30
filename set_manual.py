@@ -9,7 +9,7 @@ from tfidf_manual import *
 # 
 # Ciclo principal
 # 
-def rodar_manual(index: int, query=""):
+def rodar_manual(index: int, raw_query=""):
     print("\n\n- Modo manual - \n\n")
     df_top_x = pd.DataFrame()
     # Seleção dos datasets
@@ -34,7 +34,7 @@ def rodar_manual(index: int, query=""):
     df_tinindo[col_texto] = df_tinindo[col_texto].apply(limpar_str)
 
     # Query do usuário
-    while not query:
+    while not raw_query:
         raw_query = input("Query: ")
 
     # Limpeza a query e adição em um DataFrame

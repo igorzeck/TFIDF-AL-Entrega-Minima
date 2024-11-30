@@ -11,8 +11,9 @@ from fasthtml.common import *
 #
 df_novo = pd.DataFrame()
 app = FastHTML()
-index = 0
 cache_dict = {}
+index = 0
+modo_atual = "manual"
 
 # TODO: Página com resultado dos registros
 # TODO: Página confirmando criação de dataset
@@ -25,7 +26,10 @@ def home(query: str = ""):
         df_desc = imps.df_metadatasets.iloc[index]["Descricao"]
 
     if query:
-        df = rodar_sklearn(index, query)
+        if modo_atual == "Scikit":
+            df = rodar_sklearn(index, query)
+        else:
+            df = rodar_manual(index, query)
     elif index == -1:
         df = imps.df_metadatasets.copy()
         df_nome = "Datasets"
@@ -35,6 +39,12 @@ def home(query: str = ""):
 
     return Title("Pesquisa"), Main(
                 Style(imps.styles),
+                Div(
+                    Form(
+                        Button(f"Modo para: {"Manual" if modo_atual == "Scikit" else "Scikit"}"),
+                        action="/toggle_tfidf", method="get"
+                    )
+                ),
                 H1("Buscar", cls="h1"),
                 P("Dataset ", B(f'{df_nome}', style="color: #4CAF50"), " selecionado!"),
                 P("Descrição: ", df_desc),
@@ -234,6 +244,13 @@ def limpar_registro():
     cache_dict = dict()
     return registrar_dataset()
 
+
+@app.get("/toggle_tfidf")
+def toggle_mode():
+    global modo_atual
+    modo_atual = "Scikit" if modo_atual == "Manual" else "Manual"
+    print("Modo atual: ", modo_atual)
+    return home()
 #
 # Seleção e visualização de datasets
 #
